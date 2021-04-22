@@ -1,7 +1,19 @@
-<a href="https://github.com/andrey-helldar">
-  <img align="right" src="https://github-readme-stats.vercel.app/api?username=zackha&show_icons=true&icon_color=805AD5&text_color=718096&bg_color=ffffff00&hide_title=true&include_all_commits=true&count_private=true&hide_border=true" />
-</a>
+# Hey! 👋 I'm Zack and I love building things.
 
-### Hi 👋
+I'm a software engineer and the entrepreneur behind projects like [Startup Cities](https://perma.cc/BGG5-HBXW) 🌆 and [an experimental college 🎓 named the MPC](https://mpc.ufm.edu/).
 
-> Looking for interesting and useful solutions?
+I've been an early engineer in startups including [Clay](https://www.clay.run) and [AskLorem](https://www.asklorem.com). I also built the platform to support the climate change non-profit [Makesoil.org](https://www.makesoil.org). I maintain an active consulting practice where I've built solutions that bridge Deep Learning and web technologies.
+
+Learn more at [zach.dev](https://www.zach.dev)
+
+Email me at `zckhtln [at] icloud [dot] com`
+
+_____
+
+My Favorite Tools 🧰 🛠️
+- Typescript
+- NodeJS
+- React
+- Serverless
+- GraphQL
+- Php
