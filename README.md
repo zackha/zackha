@@ -2,10 +2,9 @@
 
 I develop software to ensure that users have a good infrastructure and interface experience.
 
-- 🔭 I’m currently working on [renderless-components](https://github.com/timelessco/renderless-components)
-- 🌱 I’m currently learning Typescript
-- 👯 I’m looking to collaborate on [Github Readme Stats](https://github.com/anuraghazra/github-readme-stats)
-- 💬 Ask me about anything [here](https://github.com/anuraghazra/anuraghazra/issues)
+- 🔭 I’m currently working on [woocommerce-rest-api](https://github.com/woocommerce/woocommerce-rest-api)
+- 🌱 I’m currently learning React
+- 💬 Ask me about anything [here](https://github.com/zackha/zackha/issues)
 
 Email me at `zckhtln [at] icloud [dot] com`
 
