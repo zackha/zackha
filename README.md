@@ -6,3 +6,5 @@ I develop software to ensure that users have a good infrastructure and interface
 - 💬 Ask me about anything [here](https://github.com/zackha/zackha/issues)
 
 Email me at `zckhtln [at] icloud [dot] com`
+
+Donate: 14Nfz7KRb7JVwHVoXdnq6Ew4LrjbBc6UHR
