@@ -3,6 +3,6 @@
 
 ### Hey!
 
-If you want to support me, you can use the links on the left.
+If you want to support me, you can use the codes on the left.
 
 Big thanks to my patrons.
