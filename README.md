@@ -1,4 +1,4 @@
-<img src="https://c.tenor.com/4QYDTI8lVcUAAAAC/eye-dark-eye.gif" width="265px" align="left">
+<img src="https://c.tenor.com/4QYDTI8lVcUAAAAC/eye-dark-eye.gif" width="260px" align="left">
 
 ```css
 WcdFh4W3xHvrOh9ASM7Ea9iORyNny07o6xn2EvCFneh3dzIrz40k+hni~kWk.ag}iL&CgM3n%AmIbY+PN
@@ -12,6 +12,5 @@ AS2NIU135UyzNUnSC+4+L8e8HZx/C1X2z797xfRelJkG4ATnpbbtKS9RGpYgX5wCRyH74Tr7yoj3+15B
 fr/uP+GjTX9HsDkSCvaLx1ICLC9H0i2DVEM1v6+I2YuJyy5/xLferak8G4+UIBjBJQ4AQepJtznWsGKDz
 FtDp1Gyd7BrJ3ymgP5TqOaCwjitWW/b+kNyIs5GLDU3uO0KdSCPL8+UtbwZ3PW0674eOCZdY7cMawxwc1
 YMr7rg5fT8NLi5siYeQUDqpDj8yrlT8doaSTVAciVprI3cwtrn0KsYbVuE9OT1W72cKAEbgcy7ZtcpUIq
-Ye0SRpI1WBgJZPo7AfemCQIv32ubDigHhcAvXgGvtYXI
 ```
 
