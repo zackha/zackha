@@ -1,8 +1,1 @@
-<img align="left" src="https://raw.githubusercontent.com/zackha/zackha/main/btc.png"> <img align="left" src="https://raw.githubusercontent.com/zackha/zackha/main/neo.png">
-
-
-### Hey!
-
-If you want to support me, you can use the codes on the left.
-
-Big thanks to my patrons.
+WcdFh4W3xHvrOh9ASM7Ea9iORyNny07o6xn2EvCFneh3dzIrz40k+hni~kWk.ag}iL&CgM3n%AmIbY+PNT1I.n_guznKBo5To(-)
