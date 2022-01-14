@@ -1,4 +1,4 @@
-<img src="https://im3.ezgif.com/tmp/ezgif-3-a4fa5d939f.gif" width="260px" align="left">
+<img src="https://raw.githubusercontent.com/zackha/zackha/main/eddie.gif" width="260px" align="left">
 
 ```css
 WcdFh4W3xHvrOh9ASM7Ea9iORyNny07o6xn2EvCFneh3dzIrz40k+hni~kWk.ag}iL&CgM3n%AmIbY+
@@ -13,4 +13,3 @@ yH74Tr7yoj3+15BEfr/uP+GjTX9HsDkSCvaLx1ICLC9H0i2DVEM1v6+I2YuJyy5/xLferak8G4+UIBj
 BJQ4AQepJtznWsGKDzFtDp1Gyd7BrJ3ymgP5TqOaCwjitWW/b+kNyIs5GLDU3uO0KdSCPL8+UtbwZ3P
 W0674eOCZdY7cMawxwc1YMr7rg5fT8NLi5siYeQUDqpDj8yrlT8doaSTVAciVprI3cwtrn0KsYbVuE9
 ```
-
