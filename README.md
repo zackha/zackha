@@ -1,4 +1,4 @@
-<img src="https://im5.ezgif.com/tmp/ezgif-5-90003cdb9f.gif" width="260px" align="left">
+<img src="https://im3.ezgif.com/tmp/ezgif-3-a4fa5d939f.gif" width="260px" align="left">
 
 ```php
 WcdFh4W3xHvrOh9ASM7Ea9iORyNny07o6xn2EvCFneh3dzIrz40k+hni~kWk.ag}iL&CgM3n%AmIbY+PN
