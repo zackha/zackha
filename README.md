@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/zackha/zackha/main/eddie.gif" width="260px" align="left">
+<img src="https://raw.githubusercontent.com/zackha/zackha/main/doubledragonneogeo0.gif" width="190px" align="left">
 
 ```css
 WcdFh4W3xHvrOh9ASM7Ea9iORyNny07o6xn2EvCFneh3dzIrz40k+hni~kWk.ag}iL&CgM3n%AmIbY+
