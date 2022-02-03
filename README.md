@@ -1,6 +1,6 @@
 #
 
-[<img src="https://raw.githubusercontent.com/zackha/zackha/main/eddie.gif" width="255px" align="left">](https://coolmodfiles.com/?trackId=150172)
+[<img src="https://raw.githubusercontent.com/zackha/zackha/main/eddie.gif" width="257px" align="left">](https://coolmodfiles.com/?trackId=150172)
 
 ```css
 WcdFh4W3xHvrOh9ASM7Ea9iORyNny07o6xn2EvCFneh3dzIrz4lQOsBGHgOUwBCACVy2vj5oh6DRrwP
