@@ -1,6 +1,6 @@
 #
 
-[<img src="https://raw.githubusercontent.com/zackha/zackha/main/eddie.gif" align="left" height="256px" width="31.4%">](https://www.youtube.com/watch?v=bmGzPC2GAQ0)
+[<img src="https://raw.githubusercontent.com/zackha/zackha/main/eddie.gif" align="left" height="256px" width="31.4%">](https://www.youtube.com/watch?v=bbtldx1qZSo)
 
 ```css
 WcdFh4W3xHvrOh9ASM7Ea9iORyNny07o6xn2EvCFneh3dzIrz4lQOsBGHgOUwBCACVy2vj5oh6DRrwP
