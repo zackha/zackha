@@ -1,3 +1,5 @@
+[<img src="https://raw.githubusercontent.com/zackha/zackha/main/eddie.gif" align="left" height="256px" width="31.4%">](https://www.youtube.com/watch?v=bbtldx1qZSo)
+
 ```css
 QAOIO=%%#;Zr.PY6zq{qVls=Y8nXcPz7!lcqx@=IjFu){HSK4]lQOsBGHgOUwBCACVy2vj5oh6DRrwPiI5dfCz%e7V==d%EU'AQd8@~swD&=glqBAS4FLe##b
 tDzm3GvepFDaosgoufh487v8sHDXjk0I9MfepkWdtoqj2tGJCULwsztkmSnwhcJGmy30v8bagvYO/qbM]ay,n381gQ2,,.Asb]thxUkWtR)_5'l098'4GL.)9
