@@ -1,6 +1,6 @@
 #
 <div>
-  <img align="left" src="./eddie.gif" width="30.2%" />
+  <img align="left" src="./eddie.gif" width="256" />
   <img align="left" src="" width="0" />
   
 ```css
