@@ -1,6 +1,6 @@
 #
-<div>
-  <img align="left" src="./eddie.gif" width="256" />
+
+  [<img src="./eddie.gif" align="left" height="256px" width="31.4%">](https://www.youtube.com/watch?v=0O2aH4XLbto)
   <img align="left" src="" width="0" />
   
 ```css
@@ -18,7 +18,7 @@ LS#ahK?=d#_6UqGSXRaFm#M@@$_@jDQj=!pSH!pPDcN2TrXwX=_DL8sef_xCRynNVVPZSEb&2gu
 vUBhXeTgWPMtUYM3UYYXU&H6FfLuym4DLeDE3-$8@N6KR_mApZf%mFUCQK=J!veLyE#Qp=MrwMC
 yJmg2?9%WYE6uPzfG&rCk9N$d+b=zzT-bLSn-6LVyMfwZqauE$4KdkW6vEdmyRJH5GEwex*XKvY
 ```
-</div>
+
 
 ```css
 QAOIO=%%#;Zr.PY6zq{qVls=Y8nXcPz7!lcqx@=IjFu){HSK4]lQOsBGHgOUwBCACVy2vj5oh6DRrwPiI5dfCz%e7V==d%EU'AQd8@~swD&=glqBA
