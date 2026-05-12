@@ -1,6 +1,6 @@
 {
   "name": "zackha",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "An interactive 1980s BBS-style terminal business card — live GitHub data, amber phosphor aesthetics, keyboard-driven links. Run: npx zackha",
   "type": "module",
   "bin": {
