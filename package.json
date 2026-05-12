@@ -3,9 +3,7 @@
   "version": "1.0.1",
   "description": "An interactive 1980s BBS-style terminal business card — live GitHub data, amber phosphor aesthetics, keyboard-driven links. Run: npx zackha",
   "type": "module",
-  "bin": {
-    "zackha": "./index.js"
-  },
+  "bin": "./index.js",
   "main": "index.js",
   "exports": "./index.js",
   "scripts": {
