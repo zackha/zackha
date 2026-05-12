@@ -10,6 +10,9 @@ import chalk from "chalk";
 import open from "open";
 import https from "node:https";
 import readline from "node:readline";
+import { createRequire } from "node:module";
+
+const { version } = createRequire(import.meta.url)("./package.json");
 
 // ─────────────────────────────────────────────────────────────
 // config
@@ -262,7 +265,7 @@ async function renderCard(data) {
 
   // title bar: SYS name on left, version+date on right
   const titleLeft = `  ${c.bright(sysName)}`;
-  const titleRight = `${c.faint("v1.0  |  " + monthYear())}  `;
+  const titleRight = `${c.faint("v" + version + "  |  " + monthYear())}  `;
   const titleGap = WIDTH - 2 - plainLen(titleLeft) - plainLen(titleRight);
   await printSlow(
     boxLine(titleLeft + " ".repeat(Math.max(1, titleGap)) + titleRight),
