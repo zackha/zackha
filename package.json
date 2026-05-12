@@ -1,0 +1,58 @@
+{
+  "name": "zackha",
+  "version": "1.0.0",
+  "description": "An interactive 1980s BBS-style terminal business card — live GitHub data, amber phosphor aesthetics, keyboard-driven links. Run: npx zackha",
+  "type": "module",
+  "bin": {
+    "zackha": "./index.js"
+  },
+  "main": "index.js",
+  "exports": "./index.js",
+  "scripts": {
+    "start": "node index.js",
+    "prepublishOnly": "node --check index.js"
+  },
+  "keywords": [
+    "cli",
+    "card",
+    "business-card",
+    "terminal",
+    "bbs",
+    "bio",
+    "npx",
+    "github",
+    "profile",
+    "interactive",
+    "retro",
+    "amber",
+    "chalk"
+  ],
+  "author": {
+    "name": "Sefa Bulak",
+    "url": "https://github.com/zackha"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/zackha/zackha#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zackha/zackha.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zackha/zackha/issues"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "open": "^11.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
