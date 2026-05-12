@@ -3,7 +3,8 @@
 /**
  * ZACKHA.SYS — a 1980s BBS terminal that happens to live in 2026.
  *
- * Pulls everything from github, formats it like a system you dialed into.
+ * Layout: ID card. Avatar lives inside the frame on the left,
+ * profile info on the right. Everything amber-tinted.
  */
 
 import chalk from "chalk";
@@ -11,7 +12,7 @@ import open from "open";
 import https from "node:https";
 import readline from "node:readline";
 import { createRequire } from "node:module";
-import { USERNAME } from "./config.js";
+import { USERNAME, AVATAR_WIDTH, AVATAR_HEIGHT } from "./config.js";
 import avatar from "./avatar.js";
 
 const { version } = createRequire(import.meta.url)("./package.json");
@@ -21,10 +22,9 @@ const { version } = createRequire(import.meta.url)("./package.json");
 // ─────────────────────────────────────────────────────────────
 const config = {
   username: USERNAME,
-  calendar: null, // optional
+  calendar: null,
 };
 
-// the amber phosphor palette
 const c = {
   frame: chalk.hex("#fbbf24"),
   bright: chalk.hex("#fcd34d"),
@@ -35,8 +35,15 @@ const c = {
   faint: chalk.hex("#78350f"),
 };
 
-const WIDTH = 68;
+// box widened to 80 chars to host the avatar inside
+const WIDTH = 80;
 const PAD = "  ";
+
+// layout columns inside the card
+const LEFT_PAD = 3;                // space from left frame to avatar
+const COL_GAP = 3;                 // gap between avatar and right column
+const AVATAR_COL = AVATAR_WIDTH;   // 23
+const RIGHT_COL = WIDTH - 2 - LEFT_PAD - AVATAR_COL - COL_GAP - 2; // remaining
 
 // ─────────────────────────────────────────────────────────────
 // data
@@ -133,6 +140,13 @@ function truncate(str, max) {
   return str.slice(0, max - 1) + "…";
 }
 
+// pad string (ANSI-aware) to exact visual width
+function padTo(str, width) {
+  const len = plainLen(str);
+  if (len >= width) return str;
+  return str + " ".repeat(width - len);
+}
+
 // ─────────────────────────────────────────────────────────────
 // box building blocks
 // ─────────────────────────────────────────────────────────────
@@ -147,16 +161,18 @@ function boxTop() { return PAD + c.frame("╔" + "═".repeat(WIDTH - 2) + "╗"
 function boxBottom() { return PAD + c.frame("╚" + "═".repeat(WIDTH - 2) + "╝"); }
 function boxDivider() { return PAD + c.frame("╠" + "═".repeat(WIDTH - 2) + "╣"); }
 
-const INNER_WIDTH = WIDTH - 6;
-function innerTop(label) {
-  const labelText = ` ${c.bright(label)} `;
-  const remaining = INNER_WIDTH - 3 - plainLen(labelText);
+// inner STATUS box, sits inside the right column
+function statusBoxTop(width) {
+  const labelText = ` ${c.bright("STATUS")} `;
+  const remaining = width - 3 - plainLen(labelText);
   return c.dim("┌─") + labelText + c.dim("─".repeat(Math.max(0, remaining))) + c.dim("┐");
 }
-function innerBottom() { return c.dim("└" + "─".repeat(INNER_WIDTH - 2) + "┘"); }
-function innerLine(content) {
-  const innerContentWidth = INNER_WIDTH - 4;
-  const pad = innerContentWidth - plainLen(content);
+function statusBoxBottom(width) {
+  return c.dim("└" + "─".repeat(width - 2) + "┘");
+}
+function statusBoxLine(content, width) {
+  const inner = width - 4;
+  const pad = inner - plainLen(content);
   const padding = pad > 0 ? " ".repeat(pad) : "";
   return c.dim("│ ") + content + padding + c.dim(" │");
 }
@@ -214,30 +230,96 @@ async function bootScreen() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// scene: avatar — render line-by-line with a "scanline" delay
+// build right column — array of lines, exactly AVATAR_HEIGHT entries
+// each entry is an ANSI string sized to RIGHT_COL width
 // ─────────────────────────────────────────────────────────────
-async function renderAvatar() {
-  if (!avatar) return;
-  const lines = avatar.split("\n");
-  console.log("");
-  for (const line of lines) {
-    console.log(PAD + line);
-    if (process.stdout.isTTY) await sleep(8); // gentle scanline reveal
+function buildRightColumn(data) {
+  const { profile, social, latest } = data;
+  const username = profile.login || config.username;
+  const name = profile.name || username;
+  const bio = (profile.bio || "no bio set").trim();
+  const loc = profile.location || "earth";
+  const status = statusOf(latest);
+
+  const lines = [];
+
+  // identity rows — fixed label column width, fixed dots
+  const LABEL_WIDTH = 9;
+  const DOTS = "....";
+  const fieldRow = (label, value) => {
+    const labelText = label.padEnd(LABEL_WIDTH, " ");
+    const labelPart = `${c.dim(">")} ${c.bright(labelText)} ${c.dim(DOTS)} `;
+    const valueMax = RIGHT_COL - plainLen(labelPart);
+    return labelPart + c.text(truncate(value, valueMax));
+  };
+
+  lines.push(fieldRow("NAME", name));
+  lines.push(fieldRow("BIO", bio));
+  lines.push(fieldRow("LOC", loc));
+  lines.push("");
+
+  // status box (occupies 4 lines)
+  const statusWidth = RIGHT_COL;
+  lines.push(statusBoxTop(statusWidth));
+
+  const bar = status.color(progressBar(status.bar));
+  const statusInner = `${bar}  ${status.color(status.label)}`;
+  lines.push(statusBoxLine(statusInner, statusWidth));
+
+  const lastSeen = latest
+    ? `last commit ${relativeTime(latest.at)}`
+    : "no recent activity";
+  lines.push(statusBoxLine(c.text(lastSeen), statusWidth));
+
+  if (latest) {
+    const repoLine = `${c.dim("→")} ${c.text(truncate(latest.target, statusWidth - 6))}`;
+    lines.push(statusBoxLine(repoLine, statusWidth));
+  } else {
+    lines.push(statusBoxLine("", statusWidth));
   }
+  lines.push(statusBoxBottom(statusWidth));
+
+  // link rows
+  lines.push("");
+  if (profile.html_url) {
+    lines.push(fieldRow("GITHUB", "/" + username));
+  }
+
+  const twitter = social.twitter || (profile.twitter_username && `https://x.com/${profile.twitter_username}`);
+  if (twitter) {
+    const handle = twitter.replace(/^https?:\/\/(twitter\.com|x\.com)\//, "/");
+    lines.push(fieldRow("X", handle));
+  }
+
+  if (profile.blog) {
+    const web = profile.blog.replace(/^https?:\/\//, "").replace(/\/$/, "");
+    lines.push(fieldRow("WEB", web));
+  }
+
+  if (profile.email) {
+    lines.push(fieldRow("MAIL", profile.email));
+  }
+
+  if (social.linkedin) {
+    const ln = social.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\//, "/");
+    lines.push(fieldRow("LINKEDIN", ln));
+  }
+
+  return lines;
 }
 
 // ─────────────────────────────────────────────────────────────
-// scene: main card
+// scene: render card with avatar inside, side-by-side
 // ─────────────────────────────────────────────────────────────
 async function renderCard(data) {
-  const { profile, social, latest } = data;
+  const { profile } = data;
   const username = profile.login || config.username;
   const sysName = username.toUpperCase() + ".SYS";
-  const status = statusOf(latest);
 
   console.log("");
   await printSlow(boxTop());
 
+  // title bar
   const titleLeft = `  ${c.bright(sysName)}`;
   const titleRight = `${c.faint("v" + version + "  |  " + monthYear())}  `;
   const titleGap = WIDTH - 2 - plainLen(titleLeft) - plainLen(titleRight);
@@ -246,62 +328,32 @@ async function renderCard(data) {
   await printSlow(boxDivider());
   await printSlow(boxLine(""));
 
-  const name = profile.name || username;
-  const bio = (profile.bio || "no bio set").trim();
-  const loc = profile.location || "earth";
+  // ─── side-by-side rows ───
+  const avatarLines = avatar.split("\n");
+  const rightLines = buildRightColumn(data);
 
-  await printSlow(boxLine(`   ${c.dim(">")} ${c.bright("NAME .....")} ${c.text(name)}`));
-  await printSlow(boxLine(`   ${c.dim(">")} ${c.bright("BIO  .....")} ${c.text(truncate(bio, WIDTH - 22))}`));
-  await printSlow(boxLine(`   ${c.dim(">")} ${c.bright("LOC  .....")} ${c.text(loc)}`));
+  // pad whichever is shorter so we render the same number of rows
+  const totalRows = Math.max(avatarLines.length, rightLines.length);
 
-  await printSlow(boxLine(""));
+  for (let i = 0; i < totalRows; i++) {
+    const avatarPart = avatarLines[i] || " ".repeat(AVATAR_COL);
+    const rightPart = rightLines[i] || "";
 
-  await printSlow(boxLine("   " + innerTop("STATUS")));
-  const bar = status.color(progressBar(status.bar));
-  const sep = c.dim("·");
-  const lastSeen = latest ? `last commit ${relativeTime(latest.at)}` : "no recent activity";
-  const statusLine = `  ${bar}  ${status.color(status.label)}  ${sep}  ${c.text(lastSeen)}`;
-  await printSlow(boxLine("   " + innerLine(statusLine)));
+    // build the inner content of the box line
+    const inner =
+      " ".repeat(LEFT_PAD) +
+      avatarPart +
+      " ".repeat(COL_GAP) +
+      padTo(rightPart, RIGHT_COL);
 
-  if (latest?.detail) {
-    const quote = `"${truncate(latest.detail, WIDTH - 16)}"`;
-    await printSlow(boxLine("   " + innerLine("  " + c.bright(quote))));
-  }
-  if (latest) {
-    await printSlow(boxLine("   " + innerLine("  " + c.bright("→") + " " + c.text(latest.target))));
-  }
-  await printSlow(boxLine("   " + innerBottom()));
-
-  await printSlow(boxLine(""));
-
-  if (profile.html_url) {
-    await printSlow(boxLine(`   ${c.dim(">")} ${c.bright("GITHUB ...")} ${c.text("/" + username)}`));
-  }
-
-  const twitter = social.twitter || (profile.twitter_username && `https://x.com/${profile.twitter_username}`);
-  if (twitter) {
-    const handle = twitter.replace(/^https?:\/\/(twitter\.com|x\.com)\//, "/");
-    await printSlow(boxLine(`   ${c.dim(">")} ${c.bright("X .......")}  ${c.text(handle)}`));
-  }
-
-  if (profile.blog) {
-    const web = profile.blog.replace(/^https?:\/\//, "").replace(/\/$/, "");
-    await printSlow(boxLine(`   ${c.dim(">")} ${c.bright("WEB .....")}  ${c.text(web)}`));
-  }
-
-  if (profile.email) {
-    await printSlow(boxLine(`   ${c.dim(">")} ${c.bright("MAIL ....")}  ${c.text(profile.email)}`));
-  }
-
-  if (social.linkedin) {
-    const ln = social.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\//, "/");
-    await printSlow(boxLine(`   ${c.dim(">")} ${c.bright("LINKEDIN .")} ${c.text(ln)}`));
+    await printSlow(boxLine(inner));
   }
 
   await printSlow(boxLine(""));
   await printSlow(boxDivider());
 
-  const actions = buildActions(profile, social);
+  // hotkey footer inside the box
+  const actions = buildActions(profile, data.social);
   const keys = actions
     .map((a) => `${c.bright("[")}${c.text.bold(a.key.toUpperCase())}${c.bright("]")}${c.dim(a.label.slice(1))}`)
     .join("  ");
@@ -400,9 +452,6 @@ async function main() {
   if (process.stdout.isTTY) {
     await bootScreen();
   }
-
-  // render the avatar before the card — line-by-line scanline reveal
-  await renderAvatar();
 
   const data = await dataPromise;
 

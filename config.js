@@ -6,5 +6,6 @@ export const USERNAME = "zackha";
 
 // avatar dimensions in characters
 // width = char columns, height = char rows (each row = 2 vertical pixels)
-export const AVATAR_WIDTH = 36;
-export const AVATAR_HEIGHT = 18;
+// sized to fit the left column of the ID card
+export const AVATAR_WIDTH = 23;
+export const AVATAR_HEIGHT = 14;

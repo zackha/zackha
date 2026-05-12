@@ -7,14 +7,13 @@
  *   node build-avatar.js
  *
  * Workflow:
- *   1. Downloads your github avatar (live, full resolution)
- *   2. Resizes to AVATAR_WIDTH × (AVATAR_HEIGHT × 2) pixels
- *   3. Encodes as ANSI half-block art (▀) with foreground+background per cell
- *   4. Writes to ./avatar.js as a default-exported string
+ *   1. Downloads your github avatar
+ *   2. Resizes + grayscales
+ *   3. Maps each pixel's brightness onto an amber gradient (phosphor look)
+ *   4. Encodes as ANSI half-block art (▀)
+ *   5. Writes to ./avatar.js as a default-exported string
  *
- * Then commit avatar.js, bump version, and `npm publish`.
- *
- * Requires sharp as a devDependency:
+ * Requires sharp:
  *   npm install --save-dev sharp
  */
 
@@ -24,17 +23,47 @@ import fs from "node:fs/promises";
 import { USERNAME, AVATAR_WIDTH, AVATAR_HEIGHT } from "./config.js";
 
 // ─────────────────────────────────────────────────────────────
-// download with redirect following
+// amber palette — dark to bright
+// these are the same hex values used in the card's chalk palette
+// ─────────────────────────────────────────────────────────────
+const AMBER_STOPS = [
+  [10, 5, 0],       // near-black (deep shadow)
+  [69, 26, 3],      // very faint amber
+  [120, 53, 15],    // burned-in
+  [146, 64, 14],    // dim amber
+  [180, 83, 9],
+  [217, 119, 6],
+  [251, 191, 36],   // bright amber (highlight)
+  [252, 211, 77],   // pale amber (specular)
+];
+
+// linear interpolation between two RGB colors
+function lerpColor(a, b, t) {
+  return [
+    Math.round(a[0] + (b[0] - a[0]) * t),
+    Math.round(a[1] + (b[1] - a[1]) * t),
+    Math.round(a[2] + (b[2] - a[2]) * t),
+  ];
+}
+
+// map a brightness value (0-255) onto the amber gradient
+function amberize(brightness) {
+  const t = brightness / 255;
+  const scaled = t * (AMBER_STOPS.length - 1);
+  const idx = Math.floor(scaled);
+  const frac = scaled - idx;
+  if (idx >= AMBER_STOPS.length - 1) return AMBER_STOPS[AMBER_STOPS.length - 1];
+  return lerpColor(AMBER_STOPS[idx], AMBER_STOPS[idx + 1], frac);
+}
+
+// ─────────────────────────────────────────────────────────────
+// download
 // ─────────────────────────────────────────────────────────────
 function download(url) {
   return new Promise((resolve, reject) => {
     https
       .get(url, { headers: { "User-Agent": "npx-card-build" } }, (res) => {
-        if (
-          res.statusCode >= 300 &&
-          res.statusCode < 400 &&
-          res.headers.location
-        ) {
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
           return download(res.headers.location).then(resolve, reject);
         }
         if (res.statusCode !== 200) {
@@ -50,41 +79,40 @@ function download(url) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// half-block encoder
+// half-block encoder with amber tinting
 // ─────────────────────────────────────────────────────────────
-// each character row = 2 vertical pixels
-// "▀" = upper half block; foreground = top pixel, background = bottom pixel
 async function imageToAnsi(imageBuffer) {
   const pixelWidth = AVATAR_WIDTH;
   const pixelHeight = AVATAR_HEIGHT * 2;
 
+  // grayscale + slight contrast boost so the amber gradient hits its range
   const { data, info } = await sharp(imageBuffer)
     .resize(pixelWidth, pixelHeight, { fit: "cover", position: "centre" })
+    .grayscale()
+    .linear(1.15, -15) // gentle contrast — preserves face detail
     .removeAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
 
-  // safety: sharp may pad output by a row; trust info.width / info.height
   const W = info.width;
   const H = info.height;
-  const channels = info.channels; // should be 3 after removeAlpha
+  const channels = info.channels;
 
-  const pixel = (x, y) => {
+  const brightness = (x, y) => {
     const i = (y * W + x) * channels;
-    return [data[i], data[i + 1], data[i + 2]];
+    // after grayscale, R=G=B; just take R
+    return data[i];
   };
 
   const lines = [];
   for (let y = 0; y < H; y += 2) {
     let line = "";
     for (let x = 0; x < W; x++) {
-      const [r1, g1, b1] = pixel(x, y);
-      const [r2, g2, b2] = y + 1 < H ? pixel(x, y + 1) : [r1, g1, b1];
-      // foreground = top pixel; background = bottom pixel; glyph = ▀
-      line +=
-        `\x1b[38;2;${r1};${g1};${b1};48;2;${r2};${g2};${b2}m\u2580`;
+      const top = amberize(brightness(x, y));
+      const bot = amberize(y + 1 < H ? brightness(x, y + 1) : brightness(x, y));
+      line += `\x1b[38;2;${top[0]};${top[1]};${top[2]};48;2;${bot[0]};${bot[1]};${bot[2]}m\u2580`;
     }
-    line += "\x1b[0m"; // reset at end of each line so background doesn't bleed
+    line += "\x1b[0m";
     lines.push(line);
   }
   return lines.join("\n");
@@ -99,11 +127,9 @@ async function main() {
   const buf = await download(avatarUrl);
   console.log(`  got ${buf.length} bytes`);
 
-  console.log(`→ Rendering to ${AVATAR_WIDTH}×${AVATAR_HEIGHT} half-blocks...`);
+  console.log(`→ Rendering to ${AVATAR_WIDTH}×${AVATAR_HEIGHT} amber-tinted half-blocks...`);
   const ansi = await imageToAnsi(buf);
 
-  // emit as a JS module
-  // JSON.stringify handles all the escape characters (including \x1b → \u001b)
   const out = `// auto-generated by build-avatar.js — do not edit
 export default ${JSON.stringify(ansi)};
 `;
