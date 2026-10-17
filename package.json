@@ -1,7 +1,7 @@
 {
   "name": "zackha",
   "version": "1.0.3",
-  "description": "An interactive 1980s BBS-style terminal business card — live GitHub data, amber phosphor aesthetics, keyboard-driven links. Run: npx zackha",
+  "description": "A phosphor-lit BBS terminal business card — responsive full-screen TUI, live GitHub signal, pixel-perfect photo on kitty/iTerm2/Ghostty/WezTerm. Run: npx zackha",
   "type": "module",
   "bin": {
     "zackha": "index.js"
@@ -10,7 +10,8 @@
   "exports": "./index.js",
   "scripts": {
     "start": "node index.js",
-    "prepublishOnly": "node --check index.js"
+    "prepublishOnly": "node --check index.js && node index.js --static > /dev/null",
+    "build:avatar": "node build-avatar.js"
   },
   "keywords": [
     "cli",
@@ -25,7 +26,12 @@
     "interactive",
     "retro",
     "amber",
-    "chalk"
+    "chalk",
+    "tui",
+    "kitty",
+    "iterm2",
+    "crt",
+    "phosphor"
   ],
   "author": {
     "name": "Sefa Bulak",
@@ -43,9 +49,8 @@
   "files": [
     "index.js",
     "config.js",
-    "avatar.js",
-    "README.md",
-    "LICENSE"
+    "src",
+    "README.md"
   ],
   "publishConfig": {
     "access": "public"

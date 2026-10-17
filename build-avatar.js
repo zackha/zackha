@@ -3,66 +3,29 @@
 /**
  * build-avatar.js
  *
- * Refreshes the avatar baked into the package. Run manually:
+ * Bakes your GitHub avatar into the package. Run manually:
  *   node build-avatar.js
  *
- * Workflow:
- *   1. Downloads your github avatar
- *   2. Resizes + grayscales
- *   3. Maps each pixel's brightness onto an amber gradient (phosphor look)
- *   4. Encodes as ANSI half-block art (▀)
- *   5. Writes to ./avatar.js as a default-exported string
+ * The image is stored as a high-resolution luminance map (SIZE×SIZE, one byte
+ * per pixel, deflated + base64). At runtime it is resampled to whatever size
+ * the terminal allows and tinted with the active phosphor theme — so the
+ * picture stays sharp from an 80×24 window up to a full-screen 4K terminal.
  *
- * Requires sharp:
- *   npm install --save-dev sharp
+ * Requires sharp (dev dependency).
  */
 
 import sharp from "sharp";
 import https from "node:https";
 import fs from "node:fs/promises";
-import { USERNAME, AVATAR_WIDTH, AVATAR_HEIGHT } from "./config.js";
+import { deflateSync } from "node:zlib";
+import { USERNAME } from "./config.js";
 
-// ─────────────────────────────────────────────────────────────
-// amber palette — dark to bright
-// these are the same hex values used in the card's chalk palette
-// ─────────────────────────────────────────────────────────────
-const AMBER_STOPS = [
-  [10, 5, 0],       // near-black (deep shadow)
-  [69, 26, 3],      // very faint amber
-  [120, 53, 15],    // burned-in
-  [146, 64, 14],    // dim amber
-  [180, 83, 9],
-  [217, 119, 6],
-  [251, 191, 36],   // bright amber (highlight)
-  [252, 211, 77],   // pale amber (specular)
-];
+const SIZE = 512;
 
-// linear interpolation between two RGB colors
-function lerpColor(a, b, t) {
-  return [
-    Math.round(a[0] + (b[0] - a[0]) * t),
-    Math.round(a[1] + (b[1] - a[1]) * t),
-    Math.round(a[2] + (b[2] - a[2]) * t),
-  ];
-}
-
-// map a brightness value (0-255) onto the amber gradient
-function amberize(brightness) {
-  const t = brightness / 255;
-  const scaled = t * (AMBER_STOPS.length - 1);
-  const idx = Math.floor(scaled);
-  const frac = scaled - idx;
-  if (idx >= AMBER_STOPS.length - 1) return AMBER_STOPS[AMBER_STOPS.length - 1];
-  return lerpColor(AMBER_STOPS[idx], AMBER_STOPS[idx + 1], frac);
-}
-
-// ─────────────────────────────────────────────────────────────
-// download
-// ─────────────────────────────────────────────────────────────
 function download(url) {
   return new Promise((resolve, reject) => {
     https
-      .get(url, { headers: { "User-Agent": "npx-card-build" } }, (res) => {
+      .get(url, { headers: { "User-Agent": "npx-zackha-build" } }, (res) => {
         if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
           return download(res.headers.location).then(resolve, reject);
         }
@@ -78,65 +41,29 @@ function download(url) {
   });
 }
 
-// ─────────────────────────────────────────────────────────────
-// half-block encoder with amber tinting
-// ─────────────────────────────────────────────────────────────
-async function imageToAnsi(imageBuffer) {
-  const pixelWidth = AVATAR_WIDTH;
-  const pixelHeight = AVATAR_HEIGHT * 2;
+async function main() {
+  const url = `https://avatars.githubusercontent.com/${USERNAME}?s=460&v=4`;
+  console.log(`→ Downloading avatar for @${USERNAME}...`);
+  const buf = await download(url);
+  console.log(`  got ${buf.length} bytes`);
 
-  // grayscale + slight contrast boost so the amber gradient hits its range
-  const { data, info } = await sharp(imageBuffer)
-    .resize(pixelWidth, pixelHeight, { fit: "cover", position: "centre" })
+  const { data, info } = await sharp(buf)
+    .resize(SIZE, SIZE, { fit: "cover", position: "attention", kernel: "lanczos3" })
     .grayscale()
-    .linear(1.15, -15) // gentle contrast — preserves face detail
-    .removeAlpha()
+    .normalise()
     .raw()
     .toBuffer({ resolveWithObject: true });
 
-  const W = info.width;
-  const H = info.height;
-  const channels = info.channels;
+  if (info.channels !== 1) throw new Error(`expected 1 channel, got ${info.channels}`);
 
-  const brightness = (x, y) => {
-    const i = (y * W + x) * channels;
-    // after grayscale, R=G=B; just take R
-    return data[i];
-  };
-
-  const lines = [];
-  for (let y = 0; y < H; y += 2) {
-    let line = "";
-    for (let x = 0; x < W; x++) {
-      const top = amberize(brightness(x, y));
-      const bot = amberize(y + 1 < H ? brightness(x, y + 1) : brightness(x, y));
-      line += `\x1b[38;2;${top[0]};${top[1]};${top[2]};48;2;${bot[0]};${bot[1]};${bot[2]}m\u2580`;
-    }
-    line += "\x1b[0m";
-    lines.push(line);
-  }
-  return lines.join("\n");
-}
-
-// ─────────────────────────────────────────────────────────────
-// main
-// ─────────────────────────────────────────────────────────────
-async function main() {
-  const avatarUrl = `https://avatars.githubusercontent.com/${USERNAME}?s=460&v=4`;
-  console.log(`→ Downloading avatar for @${USERNAME}...`);
-  const buf = await download(avatarUrl);
-  console.log(`  got ${buf.length} bytes`);
-
-  console.log(`→ Rendering to ${AVATAR_WIDTH}×${AVATAR_HEIGHT} amber-tinted half-blocks...`);
-  const ansi = await imageToAnsi(buf);
-
+  const packed = deflateSync(data, { level: 9 }).toString("base64");
   const out = `// auto-generated by build-avatar.js — do not edit
-export default ${JSON.stringify(ansi)};
+export const SIZE = ${SIZE};
+export const DATA = ${JSON.stringify(packed)};
 `;
 
-  await fs.writeFile("./avatar.js", out, "utf8");
-  console.log(`→ Wrote avatar.js (${out.length} bytes)`);
-  console.log(`\nDone. Now commit avatar.js and publish.`);
+  await fs.writeFile("./src/avatar-data.js", out, "utf8");
+  console.log(`→ Wrote src/avatar-data.js (${(out.length / 1024).toFixed(1)} KB, ${SIZE}×${SIZE})`);
 }
 
 main().catch((err) => {

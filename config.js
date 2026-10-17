@@ -4,8 +4,15 @@
 
 export const USERNAME = "zackha";
 
-// avatar dimensions in characters
-// width = char columns, height = char rows (each row = 2 vertical pixels)
-// sized to fit the left column of the ID card
-export const AVATAR_WIDTH = 23;
-export const AVATAR_HEIGHT = 14;
+// optional booking link, shown as [c] calendar when set
+export const CALENDAR = null;
+
+// used when GitHub can't be reached (offline, rate limited)
+export const FALLBACK = {
+  name: "Sefa Bulak",
+  bio: "// Silence is golden.",
+  location: "Vadsø, Norway",
+  blog: "zackha.com",
+  twitter: "https://x.com/ZHatlen",
+  linkedin: "https://linkedin.com/in/zackha",
+};
