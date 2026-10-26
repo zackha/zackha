@@ -191,11 +191,13 @@ function heatmap(cal, w, th, dense, mono) {
   const shades = [th.faint, mix(th.faint, th.fg, 0.4), mix(th.faint, th.fg, 0.7), th.fg, th.bright];
   // without color the level has to live in the glyph itself
   const cellOf = (level) => seg(mono ? "·░▒▓█"[level] : "■", shades[level]);
+  // half blocks pack two days into one cell only when color tells them apart
+  const packed = dense && !mono;
   const all = weeksOf(cal.days);
-  const weeks = all.slice(-Math.min(all.length, dense ? w : Math.floor((w + 1) / 2)));
+  const weeks = all.slice(-Math.min(all.length, packed ? w : Math.floor((w + 1) / 2)));
   const L = [];
 
-  if (dense && !mono) {
+  if (packed) {
     for (let r = 0; r < 4; r++) {
       L.push(
         weeks.map((wk) => {
