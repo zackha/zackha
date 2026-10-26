@@ -1,6 +1,6 @@
 {
   "name": "zackha",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A phosphor-lit BBS terminal business card — responsive full-screen TUI, live GitHub signal, pixel-perfect photo on kitty/iTerm2/Ghostty/WezTerm. Run: npx zackha",
   "type": "module",
   "bin": {
